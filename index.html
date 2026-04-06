@@ -27,21 +27,21 @@
     <div class="card">
         <label>Aantal Heisters</label>
         <select id="p_count">
-            <option value="2">2 Spelers</option>
-            <option value="3">3 Spelers</option>
-            <option value="4">4 Spelers</option>
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4">4 Players</option>
         </select>
     </div>
 
     <div class="card">
-        <div class="row"><span>🥇 Goud (50%)</span> <input type="number" id="v_gold" value="0"></div>
+        <div class="row"><span>🥇 Gold (50%)</span> <input type="number" id="v_gold" value="0"></div>
         <div class="row"><span>❄️ Coke (50%)</span> <input type="number" id="v_coke" value="0"></div>
-        <div class="row"><span>🖼️ Paint (50%)</span> <input type="number" id="v_paint" value="0"></div>
-        <div class="row"><span>🌿 Wiet (33.3%)</span> <input type="number" id="v_weed" value="0"></div>
+        <div class="row"><span>🖼️ Painting (50%)</span> <input type="number" id="v_paint" value="0"></div>
+        <div class="row"><span>🌿 Weed (33.3%)</span> <input type="number" id="v_weed" value="0"></div>
         <div class="row"><span>💵 Cash (25%)</span> <input type="number" id="v_cash" value="0"></div>
     </div>
 
-    <button onclick="doCalc()">BEREKEN BUIT</button>
+    <button onclick="doCalc()">Calculate</button>
 
     <div id="result"></div>
 </div>
@@ -58,10 +58,10 @@ function doCalc() {
     };
 
     var types = [
-        {id:'gold',  n:"Goud",  w:50, v:332000},
+        {id:'gold',  n:"Gold",  w:50, v:332000},
         {id:'coke',  n:"Coke",  w:50, v:220000},
-        {id:'paint', n:"Paint", w:50, v:189500},
-        {id:'weed',  n:"Wiet",  w:33.33, v:147000},
+        {id:'paint', n:"Painting", w:50, v:189500},
+        {id:'weed',  n:"Weed",  w:33.33, v:147000},
         {id:'cash',  n:"Cash",  w:25, v:90000}
     ];
 
@@ -91,7 +91,7 @@ function doCalc() {
     res.style.display = 'block';
     
     if(winst === 0) {
-        res.innerHTML = "Voer eerst wat buit in!";
+        res.innerHTML = "Enter loot!";
         res.style.background = "#ff3b30";
         return;
     }
