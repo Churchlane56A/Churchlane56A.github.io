@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Cayo Calc Pro</title>
+    <style>
+        :root {
+            --ios-blue: #007aff;
+            --ios-bg: #f2f2f7;
+            --card-bg: #ffffff;
+            --text: #000000;
+            --secondary: #8e8e93;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --card-bg: #1c1c1e;
+                --text: #ffffff;
+            }
+        }
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { width: 100%; max-width: 400px; }
+        h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: var(--ios-blue); }
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: var(--secondary); text-transform: uppercase; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid #3a3a3c;
+            font-size: 16px;
+            background: var(--card-bg);
+            color: var(--text);
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        #result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #34c759;
+            color: white;
+            display: none;
+            line-height: 1.5;
+        }
+        .loot-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .loot-row span { font-size: 15px; }
+        .loot-row input { width: 70px; margin-bottom: 0; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cayo Loot Optimizer</h1>
+    
+    <div class="card">
+        <label>Aantal Heisters</label>
+        <select id="players">
+            <option value="1">Solo (100% tas)</option>
+            <option value="2">2 Spelers (200% tas)</option>
+            <option value="3">3 Spelers (300% tas)</option>
+            <option value="4">4 Spelers (400% tas)</option>
+        </select>
+    </div>
+
+    <div class="card">
+        <label>Gevonden Buit (Aantal)</label>
+        <div class="loot-row"><span>🥇 Gold (50%)</span> <input type="number" id="gold" value="0" min="0"></div>
+        <div class="loot-row"><span>❄️ Cocaine (50%)</span> <input type="number" id="coke" value="0" min="0"></div>
+        <div class="loot-row"><span>🖼️ Schilderij (50%)</span> <input type="number" id="paint" value="0" min="0"></div>
+        <div class="loot-row"><span>🌿 Weed (33%)</span> <input type="number" id="weed" value="0" min="0"></div>
+        <div class="loot-row"><span>💵 Cash (25%)</span> <input type="number" id="cash" value="0" min="0"></div>
+    </div>
+
+    <button onclick="calculateLoot()">Bereken Beste Buit</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function calculateLoot() {
+    const players = parseInt(document.getElementById('players').value);
+    let remainingCap = players * 100;
+    
+    // Waardes en gewicht per item (gebaseerd op gemiddelde GTA-prijzen)
+    // We sorteren op waarde per 1% tasruimte
+    const lootItems = [
+        { name: "Gold", val: 332000, weight: 50 },
+        { name: "Cocaine", val: 220000, weight: 50 },
+        { name: "Schilderij", val: 189500, weight: 50 },
+        { name: "Weed", val: 147000, weight: 33.3 },
+        { name: "Cash", val: 90000, weight: 25 }
+    ];
+
+    const inventory = {
+        gold: parseInt(document.getElementById('gold').value) || 0,
+        coke: parseInt(document.getElementById('coke').value) || 0,
+        paint: parseInt(document.getElementById('paint').value) || 0,
+        weed: parseInt(document.getElementById('weed').value) || 0,
+        cash: parseInt(document.getElementById('cash').value) || 0
+    };
+
+    let totalMoney = 0;
+    let take = {};
+
+    // Het algoritme loopt door de types heen (staan al op volgorde van winstgevendheid)
+    const order = ["gold", "coke", "paint", "weed", "cash"];
+    
+    order.forEach(type => {
+        const itemInfo = lootItems.find(i => i.name.toLowerCase().includes(type) || (type === "paint" && i.name === "Schilderij"));
+        let available = inventory[type];
+        
+        while (available > 0 && remainingCap >= itemInfo.weight) {
+            remainingCap -= itemInfo.weight;
+            totalMoney += itemInfo.val;
+            take[itemInfo.name] = (take[itemInfo.name] || 0) + 1;
+            available--;
+        }
+    });
+
+    const resDiv = document.getElementById('result');
+    resDiv.style.display = 'block';
+    
+    if (totalMoney === 0) {
+        resDiv.innerHTML = "Geen buit geselecteerd of tas is te klein!";
+        resDiv.style.background = "#ff3b30";
+        return;
+    }
+
+    resDiv.style.background = "#34c759";
+    let html = `<strong>Totale Buit: $${totalMoney.toLocaleString()}</strong><br><hr style="border:0;border-top:1px solid rgba(255,255,255,0.3)">`;
+    for (const [item, count] of Object.entries(take)) {
+        html += `${count}x ${item}<br>`;
+    }
+    html += `<br><small>Overgebleven tasruimte: ${Math.round(remainingCap)}%</small>`;
+    resDiv.innerHTML = html;
+}
+</script>
+
+</body>
+</html>
