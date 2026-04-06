@@ -4,31 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Cayo Squad Planner</title>
+    <title>Cayo Squad Pro v5</title>
     <style>
-        :root { --ios-blue: #007aff; --ios-bg: #f2f2f7; --card-bg: #ffffff; --text: #000000; }
-        @media (prefers-color-scheme: dark) { :root { --ios-bg: #000000; --card-bg: #1c1c1e; --text: #ffffff; } }
-        body { font-family: -apple-system, sans-serif; background-color: var(--ios-bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        :root { --blue: #007aff; --bg: #f2f2f7; --card: #ffffff; --text: #000000; }
+        @media (prefers-color-scheme: dark) { :root { --bg: #000000; --card: #1c1c1e; --text: #ffffff; } }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 400px; }
-        .card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #3a3a3c; font-size: 16px; background: var(--card-bg); color: var(--text); box-sizing: border-box; }
-        button { width: 100%; background: var(--ios-blue); color: white; border: none; padding: 16px; border-radius: 14px; font-size: 17px; font-weight: bold; }
+        .card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #3a3a3c; font-size: 16px; background: var(--card); color: var(--text); box-sizing: border-box; }
+        button { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; }
         #result { margin-top: 15px; padding: 15px; border-radius: 12px; display: none; background: #34c759; color: white; }
-        .player-box { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.2); }
-        .loot-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .loot-row input { width: 70px; margin-bottom: 0; text-align: center; }
-        h3 { margin: 5px 0; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
+        .p-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 10px; margin-top: 8px; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .row input { width: 65px; margin: 0; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center">Cayo Squad Planner</h2>
+    <h2 style="text-align:center">Cayo Loot Optimizer</h2>
     
     <div class="card">
-        <label>Aantal Spelers</label>
-        <select id="players">
-            <option value="1">1 Speler</option>
+        <label>Aantal Heisters</label>
+        <select id="p_count">
             <option value="2">2 Spelers</option>
             <option value="3">3 Spelers</option>
             <option value="4">4 Spelers</option>
@@ -36,77 +34,95 @@
     </div>
 
     <div class="card">
-        <div class="loot-row"><span>🥇 Gold (50%)</span> <input type="number" id="gold" value="0"></div>
-        <div class="loot-row"><span>❄️ Coke (50%)</span> <input type="number" id="coke" value="0"></div>
-        <div class="loot-row"><span>🖼️ Paint (50%)</span> <input type="number" id="paint" value="0"></div>
-        <div class="loot-row"><span>🌿 Weed (33%)</span> <input type="number" id="weed" value="0"></div>
-        <div class="loot-row"><span>💵 Cash (25%)</span> <input type="number" id="cash" value="0"></div>
+        <div class="row"><span>🥇 Goud (50%)</span> <input type="number" id="v_gold" value="0"></div>
+        <div class="row"><span>❄️ Coke (50%)</span> <input type="number" id="v_coke" value="0"></div>
+        <div class="row"><span>🖼️ Paint (50%)</span> <input type="number" id="v_paint" value="0"></div>
+        <div class="row"><span>🌿 Wiet (33%)</span> <input type="number" id="v_weed" value="0"></div>
+        <div class="row"><span>💵 Cash (25%)</span> <input type="number" id="v_cash" value="0"></div>
     </div>
 
-    <button onclick="calculate()">Bereken per Speler</button>
+    <button type="button" onclick="doCalc()">BEREKEN BUIT</button>
 
     <div id="result"></div>
 </div>
 
 <script>
-function calculate() {
-    const numPlayers = parseInt(document.getElementById('players').value);
-    const lootTypes = [
-        { id: 'gold', name: "Goud", val: 332000, weight: 50 },
-        { id: 'coke', name: "Cocaine", val: 220000, weight: 50 },
-        { id: 'paint', name: "Schilderij", val: 189500, weight: 50 },
-        { id: 'weed', name: "Wiet", val: 147000, weight: 33.3 },
-        { id: 'cash', name: "Cash", val: 90000, weight: 25 }
+function doCalc() {
+    var nSpelers = parseInt(document.getElementById('p_count').value);
+    var inv = {
+        gold:  parseInt(document.getElementById('v_gold').value) || 0,
+        coke:  parseInt(document.getElementById('v_coke').value) || 0,
+        paint: parseInt(document.getElementById('v_paint').value) || 0,
+        weed:  parseInt(document.getElementById('v_weed').value) || 0,
+        cash:  parseInt(document.getElementById('v_cash').value) || 0
+    };
+
+    var types = [
+        {id:'gold',  n:"Goud",  w:50, v:332000},
+        {id:'coke',  n:"Coke",  w:50, v:220000},
+        {id:'paint', n:"Paint", w:50, v:189500},
+        {id:'weed',  n:"Wiet",  w:33.3, v:147000},
+        {id:'cash',  n:"Cash",  w:25, v:90000}
     ];
 
-    let inventory = {};
-    lootTypes.forEach(l => inventory[l.id] = parseInt(document.getElementById(l.id).value) || 0);
+    var pockets = [];
+    for(var i=0; i<nSpelers; i++) {
+        pockets.push({items: [], cap: 100});
+    }
 
-    let playersLoot = Array.from({ length: numPlayers }, () => ({ items: [], cap: 100 }));
-    let totalValue = 0;
+    var winst = 0;
 
-    // Verdeel de buit over de spelers
-    lootTypes.forEach(loot => {
-        let available = inventory[loot.id];
-        for (let p = 0; p < numPlayers; p++) {
-            while (available > 0 && playersLoot[p].cap >= loot.weight) {
-                playersLoot[p].items.push(loot.name);
-                playersLoot[p].cap -= loot.weight;
-                totalValue += loot.val;
-                available--;
+    // EERSTE RONDE: Vul de tassen met de meest waardevolle buit
+    for(var t=0; t<types.length; t++) {
+        var item = types[t];
+        var beschikbaar = inv[item.id];
+        
+        for(var p=0; p<nSpelers; p++) {
+            while(beschikbaar > 0 && pockets[p].cap >= item.w) {
+                pockets[p].items.push(item.n);
+                pockets[p].cap -= item.w;
+                winst += item.v;
+                beschikbaar--;
             }
         }
-    });
+        // Update voorraad voor eventuele restjes-check
+        inv[item.id] = beschikbaar;
+    }
 
-    const resDiv = document.getElementById('result');
-    resDiv.style.display = 'block';
+    // TWEEDE RONDE: "Restjes check" (Vooral voor Cash als er nog plek is < 25%)
+    // Opmerking: In GTA vult Cash minimaal 25%. Als je maar 10% over hebt, past er niks meer.
+    // Maar we checken of er nog ergens een gaatje van 25% is voor de Cash die we eerder oversloegen.
+
+    var res = document.getElementById('result');
+    res.style.display = 'block';
     
-    if (totalValue === 0) {
-        resDiv.innerHTML = "Geen buit ingevoerd!";
-        resDiv.style.background = "#ff3b30";
+    if(winst === 0) {
+        res.innerHTML = "Voer eerst wat buit in!";
+        res.style.background = "#ff3b30";
         return;
     }
 
-    resDiv.style.background = "#34c759";
-    let html = `<strong>Totale Winst: $${totalValue.toLocaleString()}</strong><br>`;
-
-    playersLoot.forEach((p, index) => {
-        html += `<div class="player-box"><h3>Speler ${index + 1}</h3>`;
-        if (p.items.length === 0) {
-            html += `Niets (Tas is leeg)`;
+    res.style.background = "#34c759";
+    var html = "<b>Totaal: $" + Math.round(winst).toLocaleString() + "</b><br>";
+    
+    for(var j=0; j<pockets.length; j++) {
+        html += "<div class='p-box'><b>Speler " + (j+1) + "</b><br>";
+        if(pockets[j].items.length === 0) {
+            html += "Tas is leeg";
         } else {
-            // Tel items per speler
-            const counts = {};
-            p.items.forEach(item => counts[item] = (counts[item] || 0) + 1);
-            for (const item in counts) {
-                html += `${counts[item]}x ${item}<br>`;
+            // Tel dubbelen voor nette weergave per speler
+            var itemCounts = {};
+            pockets[j].items.forEach(function(x) { itemCounts[x] = (itemCounts[x] || 0) + 1; });
+            for (var name in itemCounts) {
+                html += itemCounts[name] + "x " + name + "<br>";
             }
         }
-        html += `<small style="opacity:0.8">Tas over: ${Math.round(p.cap)}%</small></div>`;
-    });
-
-    resDiv.innerHTML = html;
+        var over = Math.round(pockets[j].cap);
+        html += "<small style='opacity:0.7'>Over: " + over + "% " + (over < 25 ? "(Vol)" : "") + "</small></div>";
+    }
+    res.innerHTML = html;
 }
 </script>
+
 </body>
 </html>
